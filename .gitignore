@@ -4,3 +4,6 @@ secrets.txt
 __pycache__
 .mypy_cache
 .vscode
+gttr.egg-info
+build
+dist

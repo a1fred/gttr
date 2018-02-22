@@ -25,6 +25,7 @@ def main(url_base, token):
 
             spinner.succeed()
 
+    print("\nTotal report:")
     for u, s in tr.total_report():
         print("👨  %s spent: %s hrs" % (u, int(s / 3600)))
 
