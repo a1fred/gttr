@@ -3,3 +3,4 @@ secrets.txt
 *.py[cod]
 __pycache__
 .mypy_cache
+.vscode
