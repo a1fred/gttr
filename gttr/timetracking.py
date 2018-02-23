@@ -5,17 +5,23 @@ from dateutil.parser import parse
 
 class TimeReport:
     def __init__(self) -> None:
-        self.data: Dict[str, int] = {}
+        self.user_totals: Dict[str, int] = {}
+        self.day_totals: Dict = {}
 
     def _parse_body(self, body: str) -> Optional[int]:
         """
         Return spent time in seconds
         """
-        if body.startswith("added") and body.endswith("of time spent"):
-            timelist = body.split()[1:-3]
+        if body.startswith("added") and "of time spent" in body:
+            timestr, _ = body.split("of time spent")
+            timelist = timestr.split()[1:]
             spent_seconds = 0
             for ts in timelist:
-                if ts.endswith('d'):
+                if ts.endswith('y'):
+                    spent_seconds += int(ts[:-1]) * 31536000
+                elif ts.endswith('w'):
+                    spent_seconds += int(ts[:-1]) * 604800
+                elif ts.endswith('d'):
                     spent_seconds += int(ts[:-1]) * 86400
                 elif ts.endswith('h'):
                     spent_seconds += int(ts[:-1]) * 3600
@@ -31,10 +37,16 @@ class TimeReport:
             return None
     
     def _add_spent_time(self, username, created_at, spent_time):
-        if username not in self.data:
-            self.data[username] = 0
+        if username not in self.user_totals:
+            self.user_totals[username] = 0
+        self.user_totals[username] += spent_time
 
-        self.data[username] += spent_time
+        created_at_date = created_at.date()
+        if created_at_date not in self.day_totals:
+            self.day_totals[created_at_date] = {}
+        if username not in self.day_totals[created_at_date]:
+            self.day_totals[created_at_date][username] = 0
+        self.day_totals[created_at_date][username] += spent_time
 
     def _parse_created_at(self, created_at_str: str) -> datetime:
         return parse(created_at_str)
@@ -47,5 +59,5 @@ class TimeReport:
             self._add_spent_time(username, created_at, spent_time)
     
     def total_report(self) -> Iterator[Tuple[str, int]]:
-        for u, s in self.data.items():
+        for u, s in self.user_totals.items():
             yield (u, s)
