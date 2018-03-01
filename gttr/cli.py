@@ -38,8 +38,8 @@ def main(url_base, token, projects):
 
 
 def cli():
-    parser = argparse.ArgumentParser("Gitlab timetrackin reporter")
+    parser = argparse.ArgumentParser("Gitlab timetracking reporter")
     parser.add_argument('url_base')
     parser.add_argument('token')
-    parser.add_argument('projects', nargs='+')
+    parser.add_argument('projects', nargs='*')
     main(**vars(parser.parse_args()))
